@@ -5,7 +5,7 @@ graph that can be printed.
 
 Here is an example for the `hello-world` sample:
 
-```txt
+```
 label_p0:
   push(0="Hello, World!");
   trace();

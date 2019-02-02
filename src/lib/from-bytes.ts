@@ -93,6 +93,12 @@ function toCfg(
         }
         let action: Action;
         switch (parsed.action.action) {
+          case ActionType.DefineFunction: {
+            throw new Error("NotImplemented: DefineFunction");
+          }
+          case ActionType.DefineFunction2: {
+            throw new Error("NotImplemented: DefineFunction2");
+          }
           case ActionType.If: {
             action = {action: ActionType.If, target: offsetToLabel(parsed.endOffset + parsed.action.offset)};
             break;
@@ -100,6 +106,12 @@ function toCfg(
           case ActionType.Jump: {
             action = {action: ActionType.Jump, target: offsetToLabel(parsed.endOffset + parsed.action.offset)};
             break;
+          }
+          case ActionType.Try: {
+            throw new Error("NotImplemented: Try");
+          }
+          case ActionType.With: {
+            throw new Error("NotImplemented: With");
           }
           default: {
             action = parsed.action;
