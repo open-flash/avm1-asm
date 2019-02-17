@@ -54,6 +54,7 @@ class CfgWriter {
 }
 
 const ACTION_TYPE_TO_NAME: ReadonlyMap<ActionType, string> = new Map([
+  [ActionType.GetUrl, "getUrl"],
   [ActionType.Jump, "jump"],
   [ActionType.Push, "push"],
   [ActionType.Trace, "trace"],
@@ -71,6 +72,12 @@ function writeActionHead(chunks: string[], action: Action): void {
 
 function writeActionArguments(chunks: string[], action: Action): void {
   switch (action.action) {
+    case ActionType.GetUrl:
+      chunks.push("url=");
+      writeStringLiteral(chunks, action.url);
+      chunks.push(", target=");
+      writeStringLiteral(chunks, action.target);
+      break;
     case ActionType.If:
       chunks.push(`target=${action.target}`);
       break;
