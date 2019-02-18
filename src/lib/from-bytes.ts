@@ -61,10 +61,11 @@ function innerFromBytes(parser: Avm1Parser, sectionStart: UintSize, sectionEnd: 
       }
     }
   }
-  return toCfg(offsetToAction, underflows, overflows);
+  return toCfg(parser, offsetToAction, underflows, overflows);
 }
 
 function toCfg(
+  parser: Avm1Parser,
   offsetToAction: ReadonlyMap<UintSize, ParsedAction>,
   underflows: ReadonlySet<UintSize>,
   overflows: ReadonlySet<UintSize>,
@@ -94,7 +95,14 @@ function toCfg(
         let action: Action;
         switch (parsed.action.action) {
           case ActionType.DefineFunction: {
-            throw new Error("NotImplemented: DefineFunction");
+            const body: Cfg = innerFromBytes(parser, parsed.endOffset - parsed.action.body.length, parsed.endOffset);
+            action = {
+              action: ActionType.DefineFunction,
+              name: parsed.action.name,
+              parameters: parsed.action.parameters,
+              body,
+            };
+            break;
           }
           case ActionType.DefineFunction2: {
             throw new Error("NotImplemented: DefineFunction2");

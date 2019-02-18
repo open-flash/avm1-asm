@@ -18,9 +18,9 @@ class CfgWriter {
     this.indentation = "  ";
   }
 
-  writeCfg(chunks: string[], cfg: Cfg): void {
+  writeCfg(chunks: string[], cfg: Cfg, depth: number = 0): void {
     for (const block of cfg.blocks) {
-      this.writeBlock(chunks, block);
+      this.writeBlock(chunks, block, depth);
     }
   }
 
@@ -30,32 +30,50 @@ class CfgWriter {
     }
   }
 
-  writeBlock(chunks: string[], block: Block) {
-    this.writeIndentation(chunks, 0);
+  writeBlock(chunks: string[], block: Block, depth: number = 0) {
+    this.writeIndentation(chunks, depth);
     chunks.push(`${block.label}:\n`);
     for (const action of block.actions) {
-      this.writeAction(chunks, action);
+      this.writeAction(chunks, action, depth + 1);
     }
     const next: Label | undefined = block.next;
     if (next === undefined) {
-      this.writeIndentation(chunks, 1);
+      this.writeIndentation(chunks, depth + 1);
       chunks.push("end;\n");
     } else {
-      this.writeIndentation(chunks, 1);
+      this.writeIndentation(chunks, depth + 1);
       chunks.push(`next ${next};\n`);
     }
   }
 
-  writeAction(chunks: string[], action: Action): void {
-    this.writeIndentation(chunks, 1);
+  writeAction(chunks: string[], action: Action, depth: number = 0): void {
+    this.writeIndentation(chunks, depth);
     writeActionHead(chunks, action);
-    chunks.push(";\n");
+    switch (action.action) {
+      case ActionType.DefineFunction: {
+        chunks.push(" {\n");
+        this.writeCfg(chunks, action.body, depth + 1);
+        this.writeIndentation(chunks, depth);
+        chunks.push("};\n");
+        break;
+      }
+      default:
+        chunks.push(";\n");
+        break;
+    }
   }
 }
 
 const ACTION_TYPE_TO_NAME: ReadonlyMap<ActionType, string> = new Map([
+  [ActionType.Call, "call"],
+  [ActionType.CallFunction, "callFunction"],
+  [ActionType.ConstantPool, "constantPool"],
+  [ActionType.DefineFunction, "defineFunction"],
+  [ActionType.DefineFunction2, "defineFunction2"],
   [ActionType.GetUrl, "getUrl"],
   [ActionType.Jump, "jump"],
+  [ActionType.Play, "play"],
+  [ActionType.Pop, "pop"],
   [ActionType.Push, "push"],
   [ActionType.Trace, "trace"],
 ]);
@@ -72,6 +90,32 @@ function writeActionHead(chunks: string[], action: Action): void {
 
 function writeActionArguments(chunks: string[], action: Action): void {
   switch (action.action) {
+    case ActionType.ConstantPool: {
+      for (const [i, value] of action.constantPool.entries()) {
+        if (i > 0) {
+          chunks.push(", ");
+        }
+        chunks.push(`${i.toString(10)}=`);
+        writeStringLiteral(chunks, value);
+      }
+      break;
+    }
+    case ActionType.DefineFunction: {
+      chunks.push("name=");
+      writeStringLiteral(chunks, action.name);
+      chunks.push(", parameters=[");
+      let first: boolean = true;
+      for (const parameter of action.parameters) {
+        if (first) {
+          first = false;
+        } else {
+          chunks.push(",");
+        }
+        writeStringLiteral(chunks, parameter);
+      }
+      chunks.push("]");
+      break;
+    }
     case ActionType.GetUrl:
       chunks.push("url=");
       writeStringLiteral(chunks, action.url);
@@ -84,18 +128,16 @@ function writeActionArguments(chunks: string[], action: Action): void {
     case ActionType.Jump:
       chunks.push(`target=${action.target}`);
       break;
-    case ActionType.Push:
-      let first: boolean = true;
+    case ActionType.Push: {
       for (const [i, value] of action.values.entries()) {
-        if (first) {
-          first = false;
-        } else {
+        if (i > 0) {
           chunks.push(", ");
         }
         chunks.push(`${i.toString(10)}=`);
         writeAvm1Value(chunks, value);
       }
       break;
+    }
     default:
       break;
   }
@@ -106,11 +148,29 @@ function writeAvm1Value(chunks: string[], value: Value) {
     case ValueType.Boolean:
       chunks.push(value.value ? "true" : "false");
       break;
+    case ValueType.Constant:
+      chunks.push(`c:${value.value.toString(10)}`);
+      break;
+    case ValueType.Float32:
+      chunks.push(`${value.value.toString(10)}f32`);
+      break;
+    case ValueType.Float64:
+      chunks.push(`${value.value.toString(10)}f64`);
+      break;
     case ValueType.Sint32:
       chunks.push(`${value.value.toString(10)}i32`);
       break;
     case ValueType.String:
       writeStringLiteral(chunks, value.value);
+      break;
+    case ValueType.Null:
+      chunks.push("null");
+      break;
+    case ValueType.Register:
+      chunks.push(`r:${value.value.toString(10)}`);
+      break;
+    case ValueType.Undefined:
+      chunks.push("undefined");
       break;
     default:
       throw new Error(`UnexpectedValueType: ${JSON.stringify(value)}`);
