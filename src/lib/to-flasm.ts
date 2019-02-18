@@ -57,6 +57,13 @@ class CfgWriter {
         chunks.push("};\n");
         break;
       }
+      case ActionType.With: {
+        chunks.push(" {\n");
+        this.writeCfg(chunks, action.with, depth + 1);
+        this.writeIndentation(chunks, depth);
+        chunks.push("};\n");
+        break;
+      }
       default:
         chunks.push(";\n");
         break;
@@ -71,11 +78,14 @@ const ACTION_TYPE_TO_NAME: ReadonlyMap<ActionType, string> = new Map([
   [ActionType.DefineFunction, "defineFunction"],
   [ActionType.DefineFunction2, "defineFunction2"],
   [ActionType.GetUrl, "getUrl"],
+  [ActionType.GetVariable, "getVariable"],
+  [ActionType.InitObject, "initObject"],
   [ActionType.Jump, "jump"],
   [ActionType.Play, "play"],
   [ActionType.Pop, "pop"],
   [ActionType.Push, "push"],
   [ActionType.Trace, "trace"],
+  [ActionType.With, "with"],
 ]);
 
 function writeActionHead(chunks: string[], action: Action): void {

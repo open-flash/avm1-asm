@@ -119,7 +119,12 @@ function toCfg(
             throw new Error("NotImplemented: Try");
           }
           case ActionType.With: {
-            throw new Error("NotImplemented: With");
+            const body: Cfg = innerFromBytes(parser, parsed.endOffset - parsed.action.with.length, parsed.endOffset);
+            action = {
+              action: ActionType.With,
+              with: body,
+            };
+            break;
           }
           default: {
             action = parsed.action;
