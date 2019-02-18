@@ -116,7 +116,26 @@ function toCfg(
             break;
           }
           case ActionType.Try: {
-            throw new Error("NotImplemented: Try");
+            let curEnd: number = parsed.endOffset;
+            let finallyCfg: Cfg | undefined;
+            if (parsed.action.finally !== undefined) {
+              finallyCfg = innerFromBytes(parser, curEnd - parsed.action.finally.length, curEnd);
+              curEnd -= parsed.action.finally.length;
+            }
+            let catchCfg: Cfg | undefined;
+            if (parsed.action.catch !== undefined) {
+              catchCfg = innerFromBytes(parser, curEnd - parsed.action.catch.length, curEnd);
+              curEnd -= parsed.action.catch.length;
+            }
+            const tryCfg: Cfg = innerFromBytes(parser, curEnd - parsed.action.try.length, curEnd);
+            action = {
+              action: ActionType.Try,
+              try: tryCfg,
+              catch: catchCfg,
+              catchTarget: parsed.action.catchTarget,
+              finally: finallyCfg,
+            };
+            break;
           }
           case ActionType.With: {
             const body: Cfg = innerFromBytes(parser, parsed.endOffset - parsed.action.with.length, parsed.endOffset);

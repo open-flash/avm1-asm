@@ -11,6 +11,9 @@ const JSON_READER: JsonReader = new JsonReader();
 const sampleNames: ReadonlyArray<string> = [
   "hello-world",
   "misaligned-jump",
+  "try-catch-err",
+  "try-catch-finally-err",
+  "try-finally-err",
   "with-shadow",
 ];
 

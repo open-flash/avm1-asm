@@ -25,7 +25,7 @@
     "lint": "gulp :lint:fix"
   },
   "dependencies": {
-    "avm1-parser": "^0.1.0",
+    "avm1-parser": "^0.1.1",
     "avm1-tree": "^0.1.0",
     "incident": "^3.2.0",
     "kryo": "^0.8.1",

@@ -1,4 +1,4 @@
-import { ActionType, Value, ValueType } from "avm1-tree";
+import { ActionType, CatchTargetType, Value, ValueType } from "avm1-tree";
 import { Action } from "./action";
 import { Block } from "./block";
 import { Cfg } from "./cfg";
@@ -54,24 +54,44 @@ class CfgWriter {
         chunks.push(" {\n");
         this.writeCfg(chunks, action.body, depth + 1);
         this.writeIndentation(chunks, depth);
-        chunks.push("};\n");
+        chunks.push("}");
+        break;
+      }
+      case ActionType.Try: {
+        chunks.push(" {\n");
+        this.writeCfg(chunks, action.try, depth + 1);
+        this.writeIndentation(chunks, depth);
+        chunks.push("}");
+        if (action.catch !== undefined) {
+          chunks.push(" catch {\n");
+          this.writeCfg(chunks, action.catch, depth + 1);
+          this.writeIndentation(chunks, depth);
+          chunks.push("}");
+        }
+        if (action.finally !== undefined) {
+          chunks.push(" finally {\n");
+          this.writeCfg(chunks, action.finally, depth + 1);
+          this.writeIndentation(chunks, depth);
+          chunks.push("}");
+        }
         break;
       }
       case ActionType.With: {
         chunks.push(" {\n");
         this.writeCfg(chunks, action.with, depth + 1);
         this.writeIndentation(chunks, depth);
-        chunks.push("};\n");
+        chunks.push("}");
         break;
       }
       default:
-        chunks.push(";\n");
         break;
     }
+    chunks.push(";\n");
   }
 }
 
 const ACTION_TYPE_TO_NAME: ReadonlyMap<ActionType, string> = new Map([
+  [ActionType.BitURShift, "bitURShift"],
   [ActionType.Call, "call"],
   [ActionType.CallFunction, "callFunction"],
   [ActionType.ConstantPool, "constantPool"],
@@ -84,7 +104,9 @@ const ACTION_TYPE_TO_NAME: ReadonlyMap<ActionType, string> = new Map([
   [ActionType.Play, "play"],
   [ActionType.Pop, "pop"],
   [ActionType.Push, "push"],
+  [ActionType.Throw, "throw"],
   [ActionType.Trace, "trace"],
+  [ActionType.Try, "try"],
   [ActionType.With, "with"],
 ]);
 
@@ -148,6 +170,20 @@ function writeActionArguments(chunks: string[], action: Action): void {
       }
       break;
     }
+    case ActionType.Try:
+      chunks.push("catchTarget=");
+      switch (action.catchTarget.type) {
+        case CatchTargetType.Register:
+          chunks.push(`r:${action.catchTarget.register.toString(10)}`);
+          break;
+        case CatchTargetType.Variable:
+          chunks.push("i:");
+          writeStringLiteral(chunks, action.catchTarget.variable);
+          break;
+        default:
+          break;
+      }
+      break;
     default:
       break;
   }
