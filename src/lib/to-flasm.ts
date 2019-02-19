@@ -50,7 +50,8 @@ class CfgWriter {
     this.writeIndentation(chunks, depth);
     writeActionHead(chunks, action);
     switch (action.action) {
-      case ActionType.DefineFunction: {
+      case ActionType.DefineFunction:
+      case ActionType.DefineFunction2: {
         chunks.push(" {\n");
         this.writeCfg(chunks, action.body, depth + 1);
         this.writeIndentation(chunks, depth);
@@ -97,13 +98,16 @@ const ACTION_TYPE_TO_NAME: ReadonlyMap<ActionType, string> = new Map([
   [ActionType.ConstantPool, "constantPool"],
   [ActionType.DefineFunction, "defineFunction"],
   [ActionType.DefineFunction2, "defineFunction2"],
+  [ActionType.DefineLocal, "defineLocal"],
   [ActionType.GetUrl, "getUrl"],
   [ActionType.GetVariable, "getVariable"],
   [ActionType.InitObject, "initObject"],
   [ActionType.Jump, "jump"],
+  [ActionType.NewObject, "newObject"],
   [ActionType.Play, "play"],
   [ActionType.Pop, "pop"],
   [ActionType.Push, "push"],
+  [ActionType.SetMember, "setMember"],
   [ActionType.Throw, "throw"],
   [ActionType.Trace, "trace"],
   [ActionType.Try, "try"],
@@ -143,7 +147,46 @@ function writeActionArguments(chunks: string[], action: Action): void {
         } else {
           chunks.push(",");
         }
+        chunks.push("i:");
         writeStringLiteral(chunks, parameter);
+      }
+      chunks.push("]");
+      break;
+    }
+    case ActionType.DefineFunction2: {
+      chunks.push("name=");
+      writeStringLiteral(chunks, action.name);
+      chunks.push(", preloadParent=");
+      writeBooleanLiteral(chunks, action.preloadParent);
+      chunks.push(", preloadRoot=");
+      writeBooleanLiteral(chunks, action.preloadRoot);
+      chunks.push(", suppressSuper=");
+      writeBooleanLiteral(chunks, action.suppressSuper);
+      chunks.push(", preloadSuper=");
+      writeBooleanLiteral(chunks, action.preloadSuper);
+      chunks.push(", suppressArguments=");
+      writeBooleanLiteral(chunks, action.suppressArguments);
+      chunks.push(", preloadArguments=");
+      writeBooleanLiteral(chunks, action.preloadArguments);
+      chunks.push(", suppressThis=");
+      writeBooleanLiteral(chunks, action.suppressThis);
+      chunks.push(", preloadThis=");
+      writeBooleanLiteral(chunks, action.preloadThis);
+      chunks.push(", preloadGlobal=");
+      writeBooleanLiteral(chunks, action.preloadGlobal);
+      chunks.push(`, registerCount=${action.registerCount.toString(10)}`);
+
+      chunks.push(", parameters=[");
+      let first: boolean = true;
+      for (const parameter of action.parameters) {
+        if (first) {
+          first = false;
+        } else {
+          chunks.push(",");
+        }
+        chunks.push(`r:${parameter.register}=`);
+        chunks.push("i:");
+        writeStringLiteral(chunks, parameter.name);
       }
       chunks.push("]");
       break;
@@ -242,4 +285,8 @@ export function writeStringLiteral(chunks: string[], value: string): void {
     }
   }
   chunks.push("\"");
+}
+
+export function writeBooleanLiteral(chunks: string[], value: boolean): void {
+  chunks.push(value ? "true" : "false");
 }

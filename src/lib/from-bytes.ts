@@ -105,7 +105,24 @@ function toCfg(
             break;
           }
           case ActionType.DefineFunction2: {
-            throw new Error("NotImplemented: DefineFunction2");
+            const body: Cfg = innerFromBytes(parser, parsed.endOffset - parsed.action.body.length, parsed.endOffset);
+            action = {
+              action: ActionType.DefineFunction2,
+              name: parsed.action.name,
+              preloadParent: parsed.action.preloadParent,
+              preloadRoot: parsed.action.preloadRoot,
+              suppressSuper: parsed.action.suppressSuper,
+              preloadSuper: parsed.action.preloadSuper,
+              suppressArguments: parsed.action.suppressArguments,
+              preloadArguments: parsed.action.preloadArguments,
+              suppressThis: parsed.action.suppressThis,
+              preloadThis: parsed.action.preloadThis,
+              preloadGlobal: parsed.action.preloadGlobal,
+              registerCount: parsed.action.registerCount,
+              parameters: parsed.action.parameters,
+              body,
+            };
+            break;
           }
           case ActionType.If: {
             action = {action: ActionType.If, target: offsetToLabel(parsed.endOffset + parsed.action.offset)};

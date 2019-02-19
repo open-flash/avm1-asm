@@ -1,6 +1,6 @@
 label_p0:
   constantPool(0="x", 1="o", 2="start", 3="shadow", 4="inner", 5="outer", 6="f", 7="no-shadow", 8="end");
-  defineFunction(name="f", parameters=["x","o"]) {
+  defineFunction(name="f", parameters=[i:"x",i:"o"]) {
     label_p63:
       push(0=c:0);
       getVariable();

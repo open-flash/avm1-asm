@@ -13,6 +13,7 @@ const JSON_VALUE_WRITER: JsonValueWriter = new JsonValueWriter();
 const sampleNames: ReadonlyArray<string> = [
   "hello-world",
   "misaligned-jump",
+  "new-simple",
   "try-catch-err",
   "try-catch-finally-err",
   "try-finally-err",
