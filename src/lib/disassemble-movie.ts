@@ -1,5 +1,5 @@
 import { Movie, Tag, TagType } from "swf-tree";
-import { DoAction } from "swf-tree/tags";
+import { DefineSprite, DoAction, DoInitAction } from "swf-tree/tags";
 import { Cfg } from "./cfg";
 import { fromBytes as cfgFromBytes } from "./from-bytes";
 import { toFlasm } from "./to-flasm";
@@ -34,13 +34,25 @@ function traverseTags(tags: ReadonlyArray<Tag>, visitor: Avm1Visitor, parentPath
 
 function traverseTag(tag: Tag, visitor: Avm1Visitor, parentPath: AstPath): void {
   switch (tag.type) {
+    case TagType.DefineSprite:
+      return traverseDefineSpriteTag(tag, visitor, parentPath);
     case TagType.DoAction:
       return traverseDoActionTag(tag, visitor, parentPath);
+    case TagType.DoInitAction:
+      return traverseDoInitActionTag(tag, visitor, parentPath);
     default:
       return;
   }
 }
 
+function traverseDefineSpriteTag(tag: DefineSprite, visitor: Avm1Visitor, parentPath: AstPath): void {
+  return traverseTags(tag.tags, visitor, [...parentPath, "tags"]);
+}
+
 function traverseDoActionTag(tag: DoAction, visitor: Avm1Visitor, parentPath: AstPath): void {
+  visitor(tag.actions, [...parentPath, "actions"]);
+}
+
+function traverseDoInitActionTag(tag: DoInitAction, visitor: Avm1Visitor, parentPath: AstPath): void {
   visitor(tag.actions, [...parentPath, "actions"]);
 }

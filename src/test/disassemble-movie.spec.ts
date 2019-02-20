@@ -9,6 +9,7 @@ import meta from "./meta.js";
 const sampleNames: ReadonlyArray<string> = [
   "hello-world",
   "hoisted-fn",
+  "tutu",
 ];
 
 describe("disassembleMovie", function () {
