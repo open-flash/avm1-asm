@@ -12,6 +12,7 @@ const JSON_VALUE_WRITER: JsonValueWriter = new JsonValueWriter();
 
 const sampleNames: ReadonlyArray<string> = [
   "hello-world",
+  "if-else",
   "misaligned-jump",
   "new-simple",
   "try-catch-err",
@@ -23,7 +24,7 @@ const sampleNames: ReadonlyArray<string> = [
 describe("fromBytes", function () {
   for (const sampleName of sampleNames) {
     it(sampleName, async function () {
-      const avm1Bytes: Uint8Array = fs.readFileSync(sysPath.join(meta.dirname, "samples", `${sampleName}.avm1`));
+      const avm1Bytes: Uint8Array = fs.readFileSync(sysPath.join(meta.dirname, "samples", `${sampleName}.in.avm1`));
       const cfgStr: string = fs.readFileSync(
         sysPath.join(meta.dirname, "samples", `${sampleName}.json`),
         {encoding: "UTF-8"},

@@ -31,7 +31,7 @@ function innerFromBytes(parser: Avm1Parser, sectionStart: UintSize, sectionEnd: 
     if (action === undefined) {
       // End of Actions
       overflows.add(curOffset);
-      break;
+      continue;
     }
     const endOffset: UintSize = parser.getBytePos();
     if (endOffset <= curOffset) {
@@ -41,7 +41,8 @@ function innerFromBytes(parser: Avm1Parser, sectionStart: UintSize, sectionEnd: 
     const nextOffsets: UintSize[] = [];
     switch (action.action) {
       case ActionType.If: {
-        nextOffsets.push(endOffset + action.offset, endOffset);
+        nextOffsets.push(endOffset + action.offset);
+        nextOffsets.push(endOffset);
         break;
       }
       case ActionType.Jump: {

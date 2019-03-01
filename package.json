@@ -25,6 +25,8 @@
     "lint": "gulp :lint:fix"
   },
   "dependencies": {
+    "@open-flash/stream": "^0.1.0",
+    "avm1-emitter": "^0.0.4",
     "avm1-parser": "^0.1.1",
     "avm1-tree": "^0.1.0",
     "incident": "^3.2.0",

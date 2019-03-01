@@ -3,7 +3,7 @@ import fs from "fs";
 import { JsonReader } from "kryo/readers/json";
 import sysPath from "path";
 import { $Cfg, Cfg } from "../lib/cfg";
-import { toFlasm } from "../lib/to-flasm";
+import { cfgToBytes } from "../lib/to-bytes";
 import meta from "./meta.js";
 
 const JSON_READER: JsonReader = new JsonReader();
@@ -11,28 +11,22 @@ const JSON_READER: JsonReader = new JsonReader();
 const sampleNames: ReadonlyArray<string> = [
   "hello-world",
   "if-else",
-  "misaligned-jump",
-  "new-simple",
-  "try-catch-err",
-  "try-catch-finally-err",
-  "try-finally-err",
-  "with-shadow",
 ];
 
-describe("toFlasm", function () {
+describe("cfgToBytes", function () {
   for (const sampleName of sampleNames) {
     it(sampleName, async function () {
-      const expectedFlasm: string = fs.readFileSync(
-        sysPath.join(meta.dirname, "samples", `${sampleName}.flasm1`),
-        {encoding: "UTF-8"},
+      const expectedAvm1Bytes: Uint8Array = fs.readFileSync(
+        sysPath.join(meta.dirname, "samples", `${sampleName}.out.avm1`),
+        {encoding: null},
       );
       const cfgStr: string = fs.readFileSync(
         sysPath.join(meta.dirname, "samples", `${sampleName}.json`),
         {encoding: "UTF-8"},
       );
       const cfg: Cfg = $Cfg.read(JSON_READER, cfgStr);
-      const actualFlasm: string = toFlasm(cfg);
-      chai.assert.strictEqual(actualFlasm, expectedFlasm);
+      const actualAvm1Bytes: Uint8Array = cfgToBytes(cfg);
+      chai.assert.deepEqual(Buffer.from(actualAvm1Bytes), expectedAvm1Bytes);
     });
   }
 });

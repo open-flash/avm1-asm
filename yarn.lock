@@ -701,6 +701,16 @@ atob@^2.1.1:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
+avm1-emitter@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/avm1-emitter/-/avm1-emitter-0.0.4.tgz#634c778f7064c414eaae1f0579f8e11f52c7f84f"
+  integrity sha512-G5tMINbPT1EIJTRcSbu6O2WB5S+nBiisIORMLzz9yAsIySQAUcRGq/Sp4Zvq0anlthtt4hip9DJOsr7l4YJavA==
+  dependencies:
+    "@open-flash/stream" "^0.1.0"
+    avm1-tree "^0.1.0"
+    incident "^3.2.0"
+    semantic-types "^0.1.1"
+
 avm1-parser@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/avm1-parser/-/avm1-parser-0.1.1.tgz#50411d6106947887f73ea3443285a08877fc4848"
@@ -1073,11 +1083,6 @@ commander@2.11.x:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.11.0.tgz#157152fd1e7a6c8d98a5b715cf376df928004563"
   integrity sha512-b0553uYA5YAEGgyYIGYROzKQ7X5RAqedkfjiZxwi0kL1g3bOaBNNZfYkzt/CL0umgD5wc9Jec2FbB98CjkMRvQ==
-
-commander@2.15.1:
-  version "2.15.1"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-2.15.1.tgz#df46e867d0fc2aec66a34662b406a9ccafff5b0f"
-  integrity sha512-VlfT9F3V0v+jr4yxPc5gg9s62/fIVWsd2Bk2iD435um1NlGMYdVCq+MjcXnhYq2icNOizHr1kK+5TI6H0Hy0ag==
 
 commander@2.19.0, commander@^2.12.1:
   version "2.19.0"
@@ -2753,26 +2758,9 @@ mkdirp@0.5.1, mkdirp@^0.5.0, mkdirp@^0.5.1:
   dependencies:
     minimist "0.0.8"
 
-mocha@^5.2.0:
+mocha@^5.2.0, "mocha@git://github.com/mochajs/mocha#955a71e971d77505f3772be0e2ffcf03ef814f58":
   version "5.2.0"
-  resolved "https://registry.yarnpkg.com/mocha/-/mocha-5.2.0.tgz#6d8ae508f59167f940f2b5b3c4a612ae50c90ae6"
-  integrity sha512-2IUgKDhc3J7Uug+FxMXuqIyYzH7gJjXECKe/w43IGgQHTSj3InJi+yAA7T24L9bQMRKiUEHxEX37G5JpVUGLcQ==
-  dependencies:
-    browser-stdout "1.3.1"
-    commander "2.15.1"
-    debug "3.1.0"
-    diff "3.5.0"
-    escape-string-regexp "1.0.5"
-    glob "7.1.2"
-    growl "1.10.5"
-    he "1.1.1"
-    minimatch "3.0.4"
-    mkdirp "0.5.1"
-    supports-color "5.4.0"
-
-"mocha@git://github.com/mochajs/mocha.git#955a71e971d77505f3772be0e2ffcf03ef814f58":
-  version "5.2.0"
-  resolved "git://github.com/mochajs/mocha.git#955a71e971d77505f3772be0e2ffcf03ef814f58"
+  resolved "git://github.com/mochajs/mocha#955a71e971d77505f3772be0e2ffcf03ef814f58"
   dependencies:
     browser-stdout "1.3.1"
     commander "2.19.0"
