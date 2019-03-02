@@ -4,7 +4,7 @@ import { Block } from "./block";
 import { Cfg } from "./cfg";
 import { Label } from "./label";
 
-export function toFlasm(cfg: Cfg): string {
+export function toAasm(cfg: Cfg): string {
   const chunks: string[] = [];
   const writer: CfgWriter = new CfgWriter();
   writer.writeCfg(chunks, cfg);

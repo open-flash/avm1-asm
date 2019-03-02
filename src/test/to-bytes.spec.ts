@@ -11,6 +11,7 @@ const JSON_READER: JsonReader = new JsonReader();
 const sampleNames: ReadonlyArray<string> = [
   "hello-world",
   "if-else",
+  "with-shadow",
 ];
 
 describe("cfgToBytes", function () {

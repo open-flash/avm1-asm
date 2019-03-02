@@ -75,7 +75,7 @@ const test: MochaTarget = {
   },
   copy: [
     {
-      files: ["**/*.{avm1,flasm1,json,swf}"],
+      files: ["**/*.{aasm1,avm1,json,swf}"],
     },
   ],
   clean: {

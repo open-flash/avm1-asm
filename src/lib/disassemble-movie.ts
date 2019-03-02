@@ -2,7 +2,7 @@ import { Movie, Tag, TagType } from "swf-tree";
 import { DefineSprite, DoAction, DoInitAction } from "swf-tree/tags";
 import { Cfg } from "./cfg";
 import { fromBytes as cfgFromBytes } from "./from-bytes";
-import { toFlasm } from "./to-flasm";
+import { toAasm } from "./to-aasm";
 
 type AstPath = ReadonlyArray<string | number>;
 type Avm1Visitor = (node: Uint8Array, path: AstPath) => void;
@@ -13,8 +13,8 @@ export function disassembleMovie(movie: Movie): string {
     chunks.push(`# ${JSON.stringify(path)}`);
     try {
       const cfg: Cfg = cfgFromBytes(avm1Bytes);
-      const flasm: string = toFlasm(cfg);
-      chunks.push(flasm);
+      const aasm: string = toAasm(cfg);
+      chunks.push(aasm);
     } catch (err) {
       chunks.push(err.toString());
     }

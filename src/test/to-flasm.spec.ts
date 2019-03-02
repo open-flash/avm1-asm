@@ -3,7 +3,7 @@ import fs from "fs";
 import { JsonReader } from "kryo/readers/json";
 import sysPath from "path";
 import { $Cfg, Cfg } from "../lib/cfg";
-import { toFlasm } from "../lib/to-flasm";
+import { toAasm } from "../lib/to-aasm";
 import meta from "./meta.js";
 
 const JSON_READER: JsonReader = new JsonReader();
@@ -19,11 +19,11 @@ const sampleNames: ReadonlyArray<string> = [
   "with-shadow",
 ];
 
-describe("toFlasm", function () {
+describe("toAasm", function () {
   for (const sampleName of sampleNames) {
     it(sampleName, async function () {
-      const expectedFlasm: string = fs.readFileSync(
-        sysPath.join(meta.dirname, "samples", `${sampleName}.flasm1`),
+      const expectedAasm: string = fs.readFileSync(
+        sysPath.join(meta.dirname, "samples", `${sampleName}.aasm1`),
         {encoding: "UTF-8"},
       );
       const cfgStr: string = fs.readFileSync(
@@ -31,8 +31,8 @@ describe("toFlasm", function () {
         {encoding: "UTF-8"},
       );
       const cfg: Cfg = $Cfg.read(JSON_READER, cfgStr);
-      const actualFlasm: string = toFlasm(cfg);
-      chai.assert.strictEqual(actualFlasm, expectedFlasm);
+      const actualAasm: string = toAasm(cfg);
+      chai.assert.strictEqual(actualAasm, expectedAasm);
     });
   }
 });

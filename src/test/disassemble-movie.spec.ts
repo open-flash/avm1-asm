@@ -15,13 +15,13 @@ describe("disassembleMovie", function () {
   for (const sampleName of sampleNames) {
     it(sampleName, async function () {
       const swfBytes: Uint8Array = fs.readFileSync(sysPath.join(meta.dirname, "movies", `${sampleName}.swf`));
-      const expectedFlasmStr: string = fs.readFileSync(
-        sysPath.join(meta.dirname, "movies", `${sampleName}.flasm1`),
+      const expectedAasmStr: string = fs.readFileSync(
+        sysPath.join(meta.dirname, "movies", `${sampleName}.aasm1`),
         {encoding: "UTF-8"},
       );
       const movie: Movie = movieFromBytes(swfBytes);
-      const actualFlasmStr: string = disassembleMovie(movie);
-      chai.assert.deepEqual(actualFlasmStr, expectedFlasmStr);
+      const actualAasmStr: string = disassembleMovie(movie);
+      chai.assert.deepEqual(actualAasmStr, expectedAasmStr);
     });
   }
 });
