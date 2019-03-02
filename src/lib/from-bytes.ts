@@ -50,7 +50,7 @@ function innerFromBytes(parser: Avm1Parser, sectionStart: UintSize, sectionEnd: 
         break;
       }
       default: {
-        if (!isFinalAction(action)) {
+        if (!isNeverAction(action)) {
           nextOffsets.push(endOffset);
         }
         break;
@@ -169,7 +169,7 @@ function toCfg(
           }
         }
         actions.push(action);
-        if (parsed.action.action === ActionType.Jump || isFinalAction(parsed.action)) {
+        if (parsed.action.action === ActionType.Jump || isNeverAction(parsed.action)) {
           next = undefined;
           break;
         } else {
@@ -192,7 +192,7 @@ function getUnlabelledOffset(offsetToAction: ReadonlyMap<UintSize, ParsedAction>
   // For each offset, number of actions ending at this offset
   const endOffsetCounts: Map<UintSize, UintSize> = new Map();
   for (const {action, endOffset} of offsetToAction.values()) {
-    if (isFinalAction(action)) {
+    if (isNeverAction(action)) {
       continue;
     }
     let count: UintSize | undefined = endOffsetCounts.get(endOffset);
@@ -218,6 +218,6 @@ function getUnlabelledOffset(offsetToAction: ReadonlyMap<UintSize, ParsedAction>
 }
 
 // Checks if the provided actions ends the control flow
-function isFinalAction(action: RawAction): action is Return | Throw {
+function isNeverAction(action: RawAction): action is Return | Throw {
   return action.action === ActionType.Return || action.action === ActionType.Throw;
 }
