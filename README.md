@@ -14,5 +14,4 @@ label_p19:
   end;
 ```
 
-The end goal (not yet implemented) of this lib is to provide a low-level
-representation for simple AVM1 transformations.
+This lib allows to convert between AVM1 bytes and a control flow graph (CFG).
