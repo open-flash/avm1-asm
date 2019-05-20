@@ -1,8 +1,8 @@
+import { $Cfg, Cfg } from "avm1-tree/cfg";
 import chai from "chai";
 import fs from "fs";
 import { JsonReader } from "kryo/readers/json";
 import sysPath from "path";
-import { $Cfg, Cfg } from "../lib/cfg";
 import { toAasm } from "../lib/to-aasm";
 import meta from "./meta.js";
 

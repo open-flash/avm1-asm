@@ -1,8 +1,11 @@
-import { ActionType, CatchTargetType, Value, ValueType } from "avm1-tree";
-import { Action } from "./action";
-import { Block } from "./block";
-import { Cfg } from "./cfg";
-import { Label } from "./label";
+import { ActionType } from "avm1-tree/action-type";
+import { CatchTargetType } from "avm1-tree/catch-targets/_type";
+import { Cfg } from "avm1-tree/cfg";
+import { CfgAction } from "avm1-tree/cfg-action";
+import { CfgBlock } from "avm1-tree/cfg-block";
+import { CfgLabel } from "avm1-tree/cfg-label";
+import { Value } from "avm1-tree/value";
+import { ValueType } from "avm1-tree/value-type";
 
 export function toAasm(cfg: Cfg): string {
   const chunks: string[] = [];
@@ -30,13 +33,13 @@ class CfgWriter {
     }
   }
 
-  writeBlock(chunks: string[], block: Block, depth: number = 0) {
+  writeBlock(chunks: string[], block: CfgBlock, depth: number = 0) {
     this.writeIndentation(chunks, depth);
     chunks.push(`${block.label}:\n`);
     for (const action of block.actions) {
       this.writeAction(chunks, action, depth + 1);
     }
-    const next: Label | undefined = block.next;
+    const next: CfgLabel | undefined = block.next;
     if (next === undefined) {
       this.writeIndentation(chunks, depth + 1);
       chunks.push("end;\n");
@@ -46,7 +49,7 @@ class CfgWriter {
     }
   }
 
-  writeAction(chunks: string[], action: Action, depth: number = 0): void {
+  writeAction(chunks: string[], action: CfgAction, depth: number = 0): void {
     this.writeIndentation(chunks, depth);
     writeActionHead(chunks, action);
     switch (action.action) {
@@ -196,7 +199,7 @@ const ACTION_TYPE_TO_NAME: ReadonlyMap<ActionType, string> = new Map([
   [ActionType.With, "with"],
 ]);
 
-function writeActionHead(chunks: string[], action: Action): void {
+function writeActionHead(chunks: string[], action: CfgAction): void {
   const name: string | undefined = ACTION_TYPE_TO_NAME.get(action.action);
   if (name === undefined) {
     throw new Error(`UnexpectedActionType: ${JSON.stringify(action)}`);
@@ -206,7 +209,7 @@ function writeActionHead(chunks: string[], action: Action): void {
   chunks.push(")");
 }
 
-function writeActionArguments(chunks: string[], action: Action): void {
+function writeActionArguments(chunks: string[], action: CfgAction): void {
   switch (action.action) {
     case ActionType.ConstantPool: {
       for (const [i, value] of action.constantPool.entries()) {
@@ -299,11 +302,11 @@ function writeActionArguments(chunks: string[], action: Action): void {
       chunks.push("catchTarget=");
       switch (action.catchTarget.type) {
         case CatchTargetType.Register:
-          chunks.push(`r:${action.catchTarget.register.toString(10)}`);
+          chunks.push(`r:${action.catchTarget.target.toString(10)}`);
           break;
         case CatchTargetType.Variable:
           chunks.push("i:");
-          writeStringLiteral(chunks, action.catchTarget.variable);
+          writeStringLiteral(chunks, action.catchTarget.target);
           break;
         default:
           break;

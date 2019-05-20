@@ -1,7 +1,7 @@
+import { cfgFromBytes } from "avm1-parser";
+import { Cfg } from "avm1-tree/cfg";
 import { Movie, Tag, TagType } from "swf-tree";
 import { DefineSprite, DoAction, DoInitAction } from "swf-tree/tags";
-import { Cfg } from "./cfg";
-import { fromBytes as cfgFromBytes } from "./from-bytes";
 import { toAasm } from "./to-aasm";
 
 type AstPath = ReadonlyArray<string | number>;
