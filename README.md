@@ -1,17 +1,21 @@
+<a href="https://github.com/open-flash/open-flash">
+    <img src="https://raw.githubusercontent.com/open-flash/open-flash/master/logo.png"
+    alt="Open Flash logo" title="Open Flash" align="right" width="64" height="64" />
+</a>
+
 # AVM1 Asm
 
-`avm1-asm` is a small lib to convert from AVM1 bytes to a control-flow assembly
-graph that can be printed.
+[![npm](https://img.shields.io/npm/v/avm1-asm.svg)](https://www.npmjs.com/package/avm1-asm)
+[![crates.io](https://img.shields.io/crates/v/avm1-asm.svg)](https://crates.io/crates/avm1-asm)
+[![GitHub repository](https://img.shields.io/badge/Github-open--flash%2Favm1--asm-blue.svg)](https://github.com/open-flash/avm1-asm)
+[![Build status](https://img.shields.io/travis/com/open-flash/avm1-asm/master.svg)](https://travis-ci.com/open-flash/avm1-asm)
 
-Here is an example for the `hello-world` sample:
+AVM1 assembly parser and emitter implemented in Typescript (Node and browser).
+Converts between textual AVM1 assembly and AVM1 bytes or [`avm1-tree` control flow graphs][avm1-tree].
 
-```
-label_p0:
-  push(0="Hello, World!");
-  trace();
-  next label_p19;
-label_p19:
-  end;
-```
+- [Typescript implementation](./ts/README.md)
 
-This lib allows to convert between AVM1 bytes and a control flow graph (CFG).
+This library is part of the [Open Flash][ofl] project.
+
+[ofl]: https://github.com/open-flash/open-flash
+[avm1-tree]: https://github.com/open-flash/avm1-tree

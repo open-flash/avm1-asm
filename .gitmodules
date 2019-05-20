@@ -1,3 +1,3 @@
-[submodule "shumway"]
-	path = shumway
-	url = https://github.com/mozilla/shumway.git
+[submodule "tests/avm1"]
+	path = tests/avm1
+	url = https://github.com/open-flash-db/avm1.git
