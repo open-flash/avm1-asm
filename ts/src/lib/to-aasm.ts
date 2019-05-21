@@ -216,6 +216,7 @@ function writeActionArguments(chunks: string[], action: CfgAction): void {
         if (i > 0) {
           chunks.push(", ");
         }
+        // TODO: Remove index
         chunks.push(`${i.toString(10)}=`);
         writeStringLiteral(chunks, value);
       }
@@ -293,9 +294,18 @@ function writeActionArguments(chunks: string[], action: CfgAction): void {
         if (i > 0) {
           chunks.push(", ");
         }
+        // TODO: Remove index
         chunks.push(`${i.toString(10)}=`);
         writeAvm1Value(chunks, value);
       }
+      break;
+    }
+    case ActionType.GotoLabel: {
+      writeStringLiteral(chunks, action.label);
+      break;
+    }
+    case ActionType.StoreRegister: {
+      chunks.push(`r:${action.register}`);
       break;
     }
     case ActionType.Try:
