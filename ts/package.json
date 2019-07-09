@@ -1,6 +1,6 @@
 {
   "name": "avm1-asm",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/open-flash/avm1-tree",
   "description": "Abstract Syntax Tree for AVM1",
   "main": "dist/lib/index.js",
