@@ -6,6 +6,7 @@ import { CfgBlock } from "avm1-tree/cfg-block";
 import { Value } from "avm1-tree/value";
 import { ValueType } from "avm1-tree/value-type";
 import { CfgBlockType } from "avm1-tree/cfg-block-type";
+import { CfgLabel } from "avm1-tree/cfg-label";
 
 export function toAasm(cfg: Cfg): string {
   const chunks: string[] = [];
@@ -22,8 +23,9 @@ class CfgWriter {
   }
 
   writeCfg(chunks: string[], cfg: Cfg, depth: number = 0): void {
-    for (const block of cfg.blocks) {
-      this.writeBlock(chunks, block, depth);
+    for (const [i, block] of cfg.blocks.entries()) {
+      const nextBlockLabel: CfgLabel | undefined = i < cfg.blocks.length - 1 ? cfg.blocks[i + 1].label : undefined;
+      this.writeBlock(chunks, block, depth, nextBlockLabel);
     }
   }
 
@@ -33,7 +35,7 @@ class CfgWriter {
     }
   }
 
-  writeBlock(chunks: string[], block: CfgBlock, depth: number = 0) {
+  writeBlock(chunks: string[], block: CfgBlock, depth: number = 0, nextBlockLabel: CfgLabel | undefined = undefined) {
     this.writeIndentation(chunks, depth);
     chunks.push(`${block.label}:\n`);
     for (const action of block.actions) {
@@ -49,8 +51,10 @@ class CfgWriter {
         chunks.push("return;\n");
         break;
       case CfgBlockType.Simple:
-        this.writeIndentation(chunks, depth + 1);
-        chunks.push(`next ${block.next};\n`);
+        if (block.next !== nextBlockLabel) {
+          this.writeIndentation(chunks, depth + 1);
+          chunks.push(`next ${block.next};\n`);
+        }
         break;
       case CfgBlockType.Throw:
         this.writeIndentation(chunks, depth + 1);

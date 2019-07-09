@@ -2,13 +2,11 @@
 label_p0:
   push(0="Hello, World!");
   trace();
-  next label_p19;
 label_p19:
   end;
 
 # ["tags",4,"actions"]
 label_p0:
   getUrl(url="FSCommand:quit", target="");
-  next label_p19;
 label_p19:
   end;
