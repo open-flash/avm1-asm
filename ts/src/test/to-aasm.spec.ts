@@ -19,7 +19,7 @@ const WHITELIST: ReadonlySet<string> = new Set([
   // "hello-world",
 ]);
 
-describe("avm1", function () {
+describe("toAasm", function () {
   this.timeout(300000); // The timeout is this high due to CI being extremely slow
 
   for (const sample of getSamples()) {

@@ -3,9 +3,9 @@ import { CatchTargetType } from "avm1-tree/catch-targets/_type";
 import { Cfg } from "avm1-tree/cfg";
 import { CfgAction } from "avm1-tree/cfg-action";
 import { CfgBlock } from "avm1-tree/cfg-block";
-import { CfgLabel } from "avm1-tree/cfg-label";
 import { Value } from "avm1-tree/value";
 import { ValueType } from "avm1-tree/value-type";
+import { CfgBlockType } from "avm1-tree/cfg-block-type";
 
 export function toAasm(cfg: Cfg): string {
   const chunks: string[] = [];
@@ -39,13 +39,25 @@ class CfgWriter {
     for (const action of block.actions) {
       this.writeAction(chunks, action, depth + 1);
     }
-    const next: CfgLabel | undefined = block.next;
-    if (next === undefined) {
-      this.writeIndentation(chunks, depth + 1);
-      chunks.push("end;\n");
-    } else {
-      this.writeIndentation(chunks, depth + 1);
-      chunks.push(`next ${next};\n`);
+    switch (block.type) {
+      case CfgBlockType.End:
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push("end;\n");
+        break;
+      case CfgBlockType.Return:
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push("return;\n");
+        break;
+      case CfgBlockType.Simple:
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push(`next ${block.next};\n`);
+        break;
+      case CfgBlockType.Throw:
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push("throw;\n");
+        break;
+      default:
+        throw new Error("UnexpectedBlockType");
     }
   }
 
