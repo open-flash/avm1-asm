@@ -3,10 +3,10 @@ import { CatchTargetType } from "avm1-tree/catch-targets/_type";
 import { Cfg } from "avm1-tree/cfg";
 import { CfgAction } from "avm1-tree/cfg-action";
 import { CfgBlock } from "avm1-tree/cfg-block";
-import { Value } from "avm1-tree/value";
-import { ValueType } from "avm1-tree/value-type";
 import { CfgBlockType } from "avm1-tree/cfg-block-type";
 import { CfgLabel } from "avm1-tree/cfg-label";
+import { Value } from "avm1-tree/value";
+import { ValueType } from "avm1-tree/value-type";
 
 export function toAasm(cfg: Cfg): string {
   const chunks: string[] = [];
@@ -42,16 +42,15 @@ class CfgWriter {
       this.writeAction(chunks, action, depth + 1);
     }
     switch (block.type) {
-      case CfgBlockType.End:
-        this.writeIndentation(chunks, depth + 1);
-        chunks.push("end;\n");
-        break;
       case CfgBlockType.Return:
         this.writeIndentation(chunks, depth + 1);
         chunks.push("return;\n");
         break;
       case CfgBlockType.Simple:
-        if (block.next !== nextBlockLabel) {
+        if (block.next === null) {
+          this.writeIndentation(chunks, depth + 1);
+          chunks.push("end;\n");
+        } else if (block.next !== nextBlockLabel) {
           this.writeIndentation(chunks, depth + 1);
           chunks.push(`next ${block.next};\n`);
         }
@@ -60,6 +59,47 @@ class CfgWriter {
         this.writeIndentation(chunks, depth + 1);
         chunks.push("throw;\n");
         break;
+      case CfgBlockType.Try: {
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push("try {\n");
+        this.writeCfg(chunks, block.try, depth + 2);
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push("}");
+        if (block.catch !== undefined) {
+          chunks.push(" catch(");
+          switch (block.catchTarget.type) {
+            case CatchTargetType.Register:
+              chunks.push(`r:${block.catchTarget.target.toString(10)}`);
+              break;
+            case CatchTargetType.Variable:
+              chunks.push("i:");
+              writeStringLiteral(chunks, block.catchTarget.target);
+              break;
+            default:
+              throw new Error("UnexpectedCatchTargetType");
+          }
+          chunks.push(") {\n");
+          this.writeCfg(chunks, block.catch, depth + 2);
+          this.writeIndentation(chunks, depth + 1);
+          chunks.push("}");
+        }
+        if (block.finally !== undefined) {
+          chunks.push(" finally {\n");
+          this.writeCfg(chunks, block.finally, depth + 2);
+          this.writeIndentation(chunks, depth + 1);
+          chunks.push("}");
+        }
+        chunks.push("\n");
+        break;
+      }
+      case CfgBlockType.With: {
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push("with {\n");
+        this.writeCfg(chunks, block.with, depth + 2);
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push("}\n");
+        break;
+      }
       default:
         throw new Error("UnexpectedBlockType");
     }
@@ -73,32 +113,6 @@ class CfgWriter {
       case ActionType.DefineFunction2: {
         chunks.push(" {\n");
         this.writeCfg(chunks, action.body, depth + 1);
-        this.writeIndentation(chunks, depth);
-        chunks.push("}");
-        break;
-      }
-      case ActionType.Try: {
-        chunks.push(" {\n");
-        this.writeCfg(chunks, action.try, depth + 1);
-        this.writeIndentation(chunks, depth);
-        chunks.push("}");
-        if (action.catch !== undefined) {
-          chunks.push(" catch {\n");
-          this.writeCfg(chunks, action.catch, depth + 1);
-          this.writeIndentation(chunks, depth);
-          chunks.push("}");
-        }
-        if (action.finally !== undefined) {
-          chunks.push(" finally {\n");
-          this.writeCfg(chunks, action.finally, depth + 1);
-          this.writeIndentation(chunks, depth);
-          chunks.push("}");
-        }
-        break;
-      }
-      case ActionType.With: {
-        chunks.push(" {\n");
-        this.writeCfg(chunks, action.with, depth + 1);
         this.writeIndentation(chunks, depth);
         chunks.push("}");
         break;
@@ -300,10 +314,7 @@ function writeActionArguments(chunks: string[], action: CfgAction): void {
       writeStringLiteral(chunks, action.target);
       break;
     case ActionType.If:
-      chunks.push(`target=${action.target}`);
-      break;
-    case ActionType.Jump:
-      chunks.push(`target=${action.target}`);
+      chunks.push(`target=${action.target === null ? "@end" : action.target}`);
       break;
     case ActionType.Push: {
       for (const [i, value] of action.values.entries()) {
@@ -324,20 +335,6 @@ function writeActionArguments(chunks: string[], action: CfgAction): void {
       chunks.push(`r:${action.register}`);
       break;
     }
-    case ActionType.Try:
-      chunks.push("catchTarget=");
-      switch (action.catchTarget.type) {
-        case CatchTargetType.Register:
-          chunks.push(`r:${action.catchTarget.target.toString(10)}`);
-          break;
-        case CatchTargetType.Variable:
-          chunks.push("i:");
-          writeStringLiteral(chunks, action.catchTarget.target);
-          break;
-        default:
-          break;
-      }
-      break;
     default:
       break;
   }

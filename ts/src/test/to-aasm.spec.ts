@@ -13,7 +13,9 @@ const AVM1_SAMPLES_ROOT: string = sysPath.join(REPO_ROOT, "tests", "avm1");
 
 const JSON_READER: JsonReader = new JsonReader();
 // `BLACKLIST` can be used to forcefully skip some tests.
-const BLACKLIST: ReadonlySet<string> = new Set([]);
+const BLACKLIST: ReadonlySet<string> = new Set([
+  "avm1-bytes/corrupted-push",
+]);
 // `WHITELIST` can be used to only enable a few tests.
 const WHITELIST: ReadonlySet<string> = new Set([
   // "hello-world",
