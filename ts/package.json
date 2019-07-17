@@ -1,14 +1,14 @@
 {
   "name": "avm1-asm",
-  "version": "0.0.3",
-  "homepage": "https://github.com/open-flash/avm1-tree",
-  "description": "Abstract Syntax Tree for AVM1",
+  "version": "0.7.0",
+  "homepage": "https://github.com/open-flash/avm1-asm",
+  "description": "Textual representation for Actionscript Assembly",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git@github.com:open-flash/avm1-tree.git"
+    "url": "git@github.com:open-flash/avm1-asm.git"
   },
   "keywords": [
     "swf",

@@ -6,11 +6,9 @@ graph that can be printed.
 Here is an example for the `hello-world` sample:
 
 ```
-label_p0:
+l0_0:
   push(0="Hello, World!");
   trace();
-  next label_p19;
-label_p19:
   end;
 ```
 
