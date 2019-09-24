@@ -42,6 +42,18 @@ class CfgWriter {
       this.writeAction(chunks, action, depth + 1);
     }
     switch (block.type) {
+      case CfgBlockType.Error:
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push("error;\n");
+        break;
+      case CfgBlockType.If:
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push("if ? ");
+        chunks.push(block.ifTrue !== null ? `next ${block.ifTrue}` : "end");
+        chunks.push(" : ");
+        chunks.push(block.ifFalse !== null ? `next ${block.ifFalse}` : "end");
+        chunks.push(";\n");
+        break;
       case CfgBlockType.Return:
         this.writeIndentation(chunks, depth + 1);
         chunks.push("return;\n");
@@ -92,6 +104,24 @@ class CfgWriter {
         chunks.push("\n");
         break;
       }
+      case CfgBlockType.WaitForFrame:
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push("waitForFrame(");
+        chunks.push(block.frame.toString(10));
+        chunks.push(") ? ");
+        chunks.push(block.ifNotLoaded !== null ? `next ${block.ifNotLoaded}` : "end");
+        chunks.push(" : ");
+        chunks.push(block.ifLoaded !== null ? `next ${block.ifLoaded}` : "end");
+        chunks.push(";\n");
+        break;
+      case CfgBlockType.WaitForFrame2:
+        this.writeIndentation(chunks, depth + 1);
+        chunks.push("waitForFrame2 ? ");
+        chunks.push(block.ifNotLoaded !== null ? `next ${block.ifNotLoaded}` : "end");
+        chunks.push(" : ");
+        chunks.push(block.ifLoaded !== null ? `next ${block.ifLoaded}` : "end");
+        chunks.push(";\n");
+        break;
       case CfgBlockType.With: {
         this.writeIndentation(chunks, depth + 1);
         chunks.push("with {\n");
@@ -312,9 +342,6 @@ function writeActionArguments(chunks: string[], action: CfgAction): void {
       writeStringLiteral(chunks, action.url);
       chunks.push(", target=");
       writeStringLiteral(chunks, action.target);
-      break;
-    case ActionType.If:
-      chunks.push(`target=${action.target === null ? "@end" : action.target}`);
       break;
     case ActionType.Push: {
       for (const [i, value] of action.values.entries()) {
