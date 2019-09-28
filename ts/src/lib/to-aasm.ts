@@ -1,12 +1,12 @@
-import { ActionType } from "avm1-tree/action-type";
-import { CatchTargetType } from "avm1-tree/catch-targets/_type";
-import { Cfg } from "avm1-tree/cfg";
-import { CfgAction } from "avm1-tree/cfg-action";
-import { CfgBlock } from "avm1-tree/cfg-block";
-import { CfgBlockType } from "avm1-tree/cfg-block-type";
-import { CfgLabel } from "avm1-tree/cfg-label";
-import { Value } from "avm1-tree/value";
-import { ValueType } from "avm1-tree/value-type";
+import { ActionType } from "avm1-types/action-type";
+import { CatchTargetType } from "avm1-types/catch-targets/_type";
+import { Cfg } from "avm1-types/cfg";
+import { CfgAction } from "avm1-types/cfg-action";
+import { CfgBlock } from "avm1-types/cfg-block";
+import { CfgBlockType } from "avm1-types/cfg-block-type";
+import { CfgLabel } from "avm1-types/cfg-label";
+import { Value } from "avm1-types/value";
+import { ValueType } from "avm1-types/value-type";
 
 export function toAasm(cfg: Cfg): string {
   const chunks: string[] = [];
@@ -23,8 +23,9 @@ class CfgWriter {
   }
 
   writeCfg(chunks: string[], cfg: Cfg, depth: number = 0): void {
-    for (const [i, block] of cfg.blocks.entries()) {
-      const nextBlockLabel: CfgLabel | undefined = i < cfg.blocks.length - 1 ? cfg.blocks[i + 1].label : undefined;
+    const blocks: ReadonlyArray<CfgBlock> = [cfg.head, ...cfg.tail];
+    for (const [i, block] of blocks.entries()) {
+      const nextBlockLabel: CfgLabel | undefined = i < blocks.length - 1 ? blocks[i + 1].label : undefined;
       this.writeBlock(chunks, block, depth, nextBlockLabel);
     }
   }

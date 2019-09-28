@@ -11,11 +11,11 @@
 [![Build status](https://img.shields.io/travis/com/open-flash/avm1-asm/master.svg)](https://travis-ci.com/open-flash/avm1-asm)
 
 AVM1 assembly parser and emitter implemented in Typescript (Node and browser).
-Converts between textual AVM1 assembly and AVM1 bytes or [`avm1-tree` control flow graphs][avm1-tree].
+Converts between textual AVM1 assembly and AVM1 bytes or [`avm1-types` control flow graphs][avm1-types].
 
 - [Typescript implementation](./ts/README.md)
 
 This library is part of the [Open Flash][ofl] project.
 
 [ofl]: https://github.com/open-flash/open-flash
-[avm1-tree]: https://github.com/open-flash/avm1-tree
+[avm1-types]: https://github.com/open-flash/avm1-types

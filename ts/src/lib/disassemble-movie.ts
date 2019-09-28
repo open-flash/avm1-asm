@@ -1,5 +1,5 @@
 import { cfgFromBytes } from "avm1-parser";
-import { Cfg } from "avm1-tree/cfg";
+import { Cfg } from "avm1-types/cfg";
 import { Movie, Tag, TagType } from "swf-tree";
 import { DefineSprite, DoAction, DoInitAction } from "swf-tree/tags";
 import { toAasm } from "./to-aasm";
