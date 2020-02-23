@@ -1,7 +1,7 @@
-import { cfgFromBytes } from "avm1-parser";
-import { Cfg } from "avm1-types/cfg";
-import { Movie, Tag, TagType } from "swf-tree";
-import { DefineSprite, DoAction, DoInitAction } from "swf-tree/tags";
+import { parseCfg } from "avm1-parser";
+import { Cfg } from "avm1-types/cfg/cfg";
+import { Movie, Tag, TagType } from "swf-types";
+import { DefineSprite, DoAction, DoInitAction } from "swf-types/tags/index";
 import { toAasm } from "./to-aasm";
 
 type AstPath = ReadonlyArray<string | number>;
@@ -12,7 +12,7 @@ export function disassembleMovie(movie: Movie): string {
   traverseMovie(movie, (avm1Bytes: Uint8Array, path: AstPath): void => {
     chunks.push(`# ${JSON.stringify(path)}`);
     try {
-      const cfg: Cfg = cfgFromBytes(avm1Bytes);
+      const cfg: Cfg = parseCfg(avm1Bytes);
       const aasm: string = toAasm(cfg);
       chunks.push(aasm);
     } catch (err) {

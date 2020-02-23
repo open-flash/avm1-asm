@@ -1,12 +1,13 @@
 import { ActionType } from "avm1-types/action-type";
 import { CatchTargetType } from "avm1-types/catch-targets/_type";
-import { Cfg } from "avm1-types/cfg";
-import { CfgAction } from "avm1-types/cfg-action";
-import { CfgBlock } from "avm1-types/cfg-block";
-import { CfgBlockType } from "avm1-types/cfg-block-type";
-import { CfgLabel } from "avm1-types/cfg-label";
-import { Value } from "avm1-types/value";
-import { ValueType } from "avm1-types/value-type";
+import { Action as CfgAction } from "avm1-types/cfg/action";
+import { Cfg } from "avm1-types/cfg/cfg";
+import { CfgBlock } from "avm1-types/cfg/cfg-block";
+import { CfgFlow } from "avm1-types/cfg/cfg-flow";
+import { CfgFlowType } from "avm1-types/cfg/cfg-flow-type";
+import { CfgLabel } from "avm1-types/cfg/cfg-label";
+import { PushValue } from "avm1-types/push-value";
+import { PushValueType } from "avm1-types/push-value-type";
 
 export function toAasm(cfg: Cfg): string {
   const chunks: string[] = [];
@@ -23,7 +24,7 @@ class CfgWriter {
   }
 
   writeCfg(chunks: string[], cfg: Cfg, depth: number = 0): void {
-    const blocks: ReadonlyArray<CfgBlock> = [cfg.head, ...cfg.tail];
+    const blocks: readonly CfgBlock[] = cfg.blocks;
     for (const [i, block] of blocks.entries()) {
       const nextBlockLabel: CfgLabel | undefined = i < blocks.length - 1 ? blocks[i + 1].label : undefined;
       this.writeBlock(chunks, block, depth, nextBlockLabel);
@@ -42,91 +43,92 @@ class CfgWriter {
     for (const action of block.actions) {
       this.writeAction(chunks, action, depth + 1);
     }
-    switch (block.type) {
-      case CfgBlockType.Error:
+    const flow: CfgFlow = block.flow;
+    switch (flow.type) {
+      case CfgFlowType.Error:
         this.writeIndentation(chunks, depth + 1);
         chunks.push("error;\n");
         break;
-      case CfgBlockType.If:
+      case CfgFlowType.If:
         this.writeIndentation(chunks, depth + 1);
         chunks.push("if ? ");
-        chunks.push(block.ifTrue !== null ? `next ${block.ifTrue}` : "end");
+        chunks.push(flow.trueTarget !== null ? `next ${flow.trueTarget}` : "end");
         chunks.push(" : ");
-        chunks.push(block.ifFalse !== null ? `next ${block.ifFalse}` : "end");
+        chunks.push(flow.falseTarget !== null ? `next ${flow.falseTarget}` : "end");
         chunks.push(";\n");
         break;
-      case CfgBlockType.Return:
+      case CfgFlowType.Return:
         this.writeIndentation(chunks, depth + 1);
         chunks.push("return;\n");
         break;
-      case CfgBlockType.Simple:
-        if (block.next === null) {
+      case CfgFlowType.Simple:
+        if (flow.next === null) {
           this.writeIndentation(chunks, depth + 1);
           chunks.push("end;\n");
-        } else if (block.next !== nextBlockLabel) {
+        } else if (flow.next !== nextBlockLabel) {
           this.writeIndentation(chunks, depth + 1);
-          chunks.push(`next ${block.next};\n`);
+          chunks.push(`next ${flow.next};\n`);
         }
         break;
-      case CfgBlockType.Throw:
+      case CfgFlowType.Throw:
         this.writeIndentation(chunks, depth + 1);
         chunks.push("throw;\n");
         break;
-      case CfgBlockType.Try: {
+      case CfgFlowType.Try: {
         this.writeIndentation(chunks, depth + 1);
         chunks.push("try {\n");
-        this.writeCfg(chunks, block.try, depth + 2);
+        this.writeCfg(chunks, flow.try, depth + 2);
         this.writeIndentation(chunks, depth + 1);
         chunks.push("}");
-        if (block.catch !== undefined) {
+        if (flow.catch !== undefined) {
           chunks.push(" catch(");
-          switch (block.catchTarget.type) {
+          switch (flow.catch.target.type) {
             case CatchTargetType.Register:
-              chunks.push(`r:${block.catchTarget.target.toString(10)}`);
+              chunks.push(`r:${flow.catch.target.target.toString(10)}`);
               break;
             case CatchTargetType.Variable:
               chunks.push("i:");
-              writeStringLiteral(chunks, block.catchTarget.target);
+              writeStringLiteral(chunks, flow.catch.target.target);
               break;
             default:
               throw new Error("UnexpectedCatchTargetType");
           }
           chunks.push(") {\n");
-          this.writeCfg(chunks, block.catch, depth + 2);
+          this.writeCfg(chunks, flow.catch.body, depth + 2);
           this.writeIndentation(chunks, depth + 1);
           chunks.push("}");
         }
-        if (block.finally !== undefined) {
+        if (flow.finally !== undefined) {
           chunks.push(" finally {\n");
-          this.writeCfg(chunks, block.finally, depth + 2);
+          this.writeCfg(chunks, flow.finally, depth + 2);
           this.writeIndentation(chunks, depth + 1);
           chunks.push("}");
         }
         chunks.push("\n");
         break;
       }
-      case CfgBlockType.WaitForFrame:
+      case CfgFlowType.WaitForFrame:
         this.writeIndentation(chunks, depth + 1);
         chunks.push("waitForFrame(");
-        chunks.push(block.frame.toString(10));
+        chunks.push(flow.frame.toString(10));
         chunks.push(") ? ");
-        chunks.push(block.ifNotLoaded !== null ? `next ${block.ifNotLoaded}` : "end");
+        chunks.push(flow.loadingTarget !== null ? `next ${flow.loadingTarget}` : "end");
         chunks.push(" : ");
-        chunks.push(block.ifLoaded !== null ? `next ${block.ifLoaded}` : "end");
+        chunks.push(flow.readyTarget !== null ? `next ${flow.readyTarget}` : "end");
         chunks.push(";\n");
         break;
-      case CfgBlockType.WaitForFrame2:
+      case CfgFlowType.WaitForFrame2:
         this.writeIndentation(chunks, depth + 1);
         chunks.push("waitForFrame2 ? ");
-        chunks.push(block.ifNotLoaded !== null ? `next ${block.ifNotLoaded}` : "end");
+        chunks.push(flow.loadingTarget !== null ? `next ${flow.loadingTarget}` : "end");
         chunks.push(" : ");
-        chunks.push(block.ifLoaded !== null ? `next ${block.ifLoaded}` : "end");
+        chunks.push(flow.readyTarget !== null ? `next ${flow.readyTarget}` : "end");
         chunks.push(";\n");
         break;
-      case CfgBlockType.With: {
+      case CfgFlowType.With: {
         this.writeIndentation(chunks, depth + 1);
         chunks.push("with {\n");
-        this.writeCfg(chunks, block.with, depth + 2);
+        this.writeCfg(chunks, flow.body, depth + 2);
         this.writeIndentation(chunks, depth + 1);
         chunks.push("}\n");
         break;
@@ -156,7 +158,7 @@ class CfgWriter {
 }
 
 const ACTION_TYPE_TO_NAME: ReadonlyMap<ActionType, string> = new Map([
-  [ActionType.Unknown, "unknown"],
+  [ActionType.Raw, "raw"],
   [ActionType.Add, "add"],
   [ActionType.Add2, "add2"],
   [ActionType.And, "and"],
@@ -273,7 +275,7 @@ function writeActionHead(chunks: string[], action: CfgAction): void {
 function writeActionArguments(chunks: string[], action: CfgAction): void {
   switch (action.action) {
     case ActionType.ConstantPool: {
-      for (const [i, value] of action.constantPool.entries()) {
+      for (const [i, value] of action.pool.entries()) {
         if (i > 0) {
           chunks.push(", ");
         }
@@ -351,7 +353,7 @@ function writeActionArguments(chunks: string[], action: CfgAction): void {
         }
         // TODO: Remove index
         chunks.push(`${i.toString(10)}=`);
-        writeAvm1Value(chunks, value);
+        writePushValue(chunks, value);
       }
       break;
     }
@@ -368,33 +370,33 @@ function writeActionArguments(chunks: string[], action: CfgAction): void {
   }
 }
 
-function writeAvm1Value(chunks: string[], value: Value) {
+function writePushValue(chunks: string[], value: PushValue) {
   switch (value.type) {
-    case ValueType.Boolean:
+    case PushValueType.Boolean:
       chunks.push(value.value ? "true" : "false");
       break;
-    case ValueType.Constant:
+    case PushValueType.Constant:
       chunks.push(`c:${value.value.toString(10)}`);
       break;
-    case ValueType.Float32:
+    case PushValueType.Float32:
       chunks.push(`${value.value.toString(10)}f32`);
       break;
-    case ValueType.Float64:
+    case PushValueType.Float64:
       chunks.push(`${value.value.toString(10)}f64`);
       break;
-    case ValueType.Sint32:
+    case PushValueType.Sint32:
       chunks.push(`${value.value.toString(10)}i32`);
       break;
-    case ValueType.String:
+    case PushValueType.String:
       writeStringLiteral(chunks, value.value);
       break;
-    case ValueType.Null:
+    case PushValueType.Null:
       chunks.push("null");
       break;
-    case ValueType.Register:
+    case PushValueType.Register:
       chunks.push(`r:${value.value.toString(10)}`);
       break;
-    case ValueType.Undefined:
+    case PushValueType.Undefined:
       chunks.push("undefined");
       break;
     default:

@@ -1,8 +1,8 @@
 import chai from "chai";
 import fs from "fs";
 import sysPath from "path";
-import { movieFromBytes } from "swf-parser";
-import { Movie } from "swf-tree";
+import { parseSwf } from "swf-parser";
+import { Movie } from "swf-types";
 import { disassembleMovie } from "../lib/disassemble-movie";
 import meta from "./meta.js";
 
@@ -19,7 +19,7 @@ describe("disassembleMovie", function () {
         sysPath.join(meta.dirname, "movies", `${sampleName}.aasm1`),
         {encoding: "UTF-8"},
       );
-      const movie: Movie = movieFromBytes(swfBytes);
+      const movie: Movie = parseSwf(swfBytes);
       const actualAasmStr: string = disassembleMovie(movie);
       chai.assert.deepEqual(actualAasmStr, expectedAasmStr);
     });
