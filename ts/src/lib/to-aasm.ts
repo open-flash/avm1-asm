@@ -1,13 +1,13 @@
-import { ActionType } from "avm1-types/action-type";
-import { CatchTargetType } from "avm1-types/catch-targets/_type";
-import { Action as CfgAction } from "avm1-types/cfg/action";
-import { Cfg } from "avm1-types/cfg/cfg";
-import { CfgBlock } from "avm1-types/cfg/cfg-block";
-import { CfgFlow } from "avm1-types/cfg/cfg-flow";
-import { CfgFlowType } from "avm1-types/cfg/cfg-flow-type";
-import { CfgLabel } from "avm1-types/cfg/cfg-label";
-import { PushValue } from "avm1-types/push-value";
-import { PushValueType } from "avm1-types/push-value-type";
+import { ActionType } from "avm1-types/lib/action-type.js";
+import { CatchTargetType } from "avm1-types/lib/catch-targets/_type.js";
+import { Action as CfgAction } from "avm1-types/lib/cfg/action.js";
+import { Cfg } from "avm1-types/lib/cfg/cfg.js";
+import { CfgBlock } from "avm1-types/lib/cfg/cfg-block.js";
+import { CfgFlow } from "avm1-types/lib/cfg/cfg-flow.js";
+import { CfgFlowType } from "avm1-types/lib/cfg/cfg-flow-type.js";
+import { CfgLabel } from "avm1-types/lib/cfg/cfg-label.js";
+import { PushValue } from "avm1-types/lib/push-value.js";
+import { PushValueType } from "avm1-types/lib/push-value-type.js";
 
 export function toAasm(cfg: Cfg): string {
   const chunks: string[] = [];
@@ -24,6 +24,7 @@ class CfgWriter {
   }
 
   writeCfg(chunks: string[], cfg: Cfg, depth: number = 0): void {
+    // tslint:disable:restrict-plus-operands
     const blocks: readonly CfgBlock[] = cfg.blocks;
     for (const [i, block] of blocks.entries()) {
       const nextBlockLabel: CfgLabel | undefined = i < blocks.length - 1 ? blocks[i + 1].label : undefined;
@@ -361,8 +362,19 @@ function writeActionArguments(chunks: string[], action: CfgAction): void {
       writeStringLiteral(chunks, action.label);
       break;
     }
+    case ActionType.Raw: {
+      chunks.push(`code = 0x${action.code.toString(16)}`);
+      if (action.data.length > 0) {
+        chunks.push(`, data = ...`);
+      }
+      break;
+    }
     case ActionType.StoreRegister: {
       chunks.push(`r:${action.register}`);
+      break;
+    }
+    case ActionType.StrictMode: {
+      chunks.push(action.isStrict ? "true" : "false");
       break;
     }
     default:
