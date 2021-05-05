@@ -1,17 +1,16 @@
-import { $Cfg, Cfg } from "avm1-types/cfg/cfg";
+import { $Cfg, Cfg } from "avm1-types/lib/cfg/cfg.js";
 import chai from "chai";
 import fs from "fs";
-import { JsonReader } from "kryo/readers/json";
 import sysPath from "path";
-import { toAasm } from "../lib/to-aasm";
+import { toAasm } from "../lib/to-aasm.js";
 import meta from "./meta.js";
-import { readTextFile, writeTextFile } from "./utils";
+import { readTextFile, writeTextFile } from "./utils.js";
+import { JSON_READER } from "kryo-json/lib/json-reader.js";
 
-const PROJECT_ROOT: string = sysPath.join(meta.dirname, "..", "..", "..");
+const PROJECT_ROOT: string = sysPath.join(meta.dirname, "..");
 const REPO_ROOT: string = sysPath.join(PROJECT_ROOT, "..");
 const AVM1_SAMPLES_ROOT: string = sysPath.join(REPO_ROOT, "tests", "avm1");
 
-const JSON_READER: JsonReader = new JsonReader();
 // `BLACKLIST` can be used to forcefully skip some tests.
 const BLACKLIST: ReadonlySet<string> = new Set([
   // "avm1-bytes/corrupted-push",
