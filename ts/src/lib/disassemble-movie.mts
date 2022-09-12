@@ -1,8 +1,9 @@
 import { parseCfg } from "avm1-parser";
-import { Cfg } from "avm1-types/lib/cfg/cfg.js";
+import { Cfg } from "avm1-types/cfg/cfg";
 import { Movie, Tag, TagType } from "swf-types";
-import { DefineSprite, DoAction, DoInitAction } from "swf-types/lib/tags/index.js";
-import { toAasm } from "./to-aasm.js";
+import { DefineSprite, DoAction, DoInitAction } from "swf-types/tags/index";
+
+import { toAasm } from "./to-aasm.mjs";
 
 type AstPath = ReadonlyArray<string | number>;
 type Avm1Visitor = (node: Uint8Array, path: AstPath) => void;
@@ -17,8 +18,8 @@ export function disassembleMovie(movie: Movie): string {
       const cfg: Cfg = parseCfg(avm1Bytes) as any;
       const aasm: string = toAasm(cfg);
       chunks.push(aasm);
-    } catch (err) {
-      chunks.push(err.toString());
+    } catch (err: unknown) {
+      chunks.push("" + err);
     }
   });
   return chunks.join("\n");

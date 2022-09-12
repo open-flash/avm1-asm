@@ -1,11 +1,12 @@
-import { $Cfg, Cfg } from "avm1-types/lib/cfg/cfg.js";
+import { $Cfg, Cfg } from "avm1-types/cfg/cfg";
 import chai from "chai";
 import fs from "fs";
+import { JSON_READER } from "kryo-json/json-reader";
 import sysPath from "path";
-import { toAasm } from "../lib/to-aasm.js";
-import meta from "./meta.js";
-import { readTextFile, writeTextFile } from "./utils.js";
-import { JSON_READER } from "kryo-json/lib/json-reader.js";
+
+import { toAasm } from "../lib/to-aasm.mjs";
+import meta from "./meta.mjs";
+import { readTextFile, writeTextFile } from "./utils.mjs";
 
 const PROJECT_ROOT: string = sysPath.join(meta.dirname, "..");
 const REPO_ROOT: string = sysPath.join(PROJECT_ROOT, "..");

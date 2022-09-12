@@ -3,8 +3,9 @@ import fs from "fs";
 import sysPath from "path";
 import { parseSwf } from "swf-parser";
 import { Movie } from "swf-types";
-import { disassembleMovie } from "../lib/disassemble-movie.js";
-import meta from "./meta.js";
+
+import { disassembleMovie } from "../lib/disassemble-movie.mjs";
+import meta from "./meta.mjs";
 
 const sampleNames: ReadonlyArray<string> = [
   "hello-world",
