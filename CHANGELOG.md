@@ -1,4 +1,4 @@
-# Next
+# 0.14.0 (2022-09-12)
 
 - **[Breaking change]** Update to `avm1-types@0.14`.
 - **[Internal]** Update to Yarn 3.
